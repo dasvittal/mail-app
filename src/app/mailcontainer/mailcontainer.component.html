@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="row">
+    <div class="col-lg-10">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search..." />
+        <span class="input-group-btn">
+          <button class="btn btn-secondary" type="button">Search </button>
+        </span>
+      </div>
+    </div>
+    
+    <div class="row">
+      <ul class="list-group">
+        <a (click)="getThreadBody(mail.id)"><li class="list-group-item" *ngFor="let mail of mailThreads">{{mail.snippet}}</li></a>
+      </ul>
+    </div>
+  </div>
+
+</div>
