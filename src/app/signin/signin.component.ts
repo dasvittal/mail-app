@@ -14,6 +14,7 @@ export class SigninComponent implements  AfterViewInit  {
 
   private clientId = '651858061774-i0qb3g5sifrbvtiifg5956et0ocj64jh.apps.googleusercontent.com';
   public auth2: any;
+  public showSignInBtn = false;
 
   constructor(private signInService: SigninService,
               private router: Router) { }
@@ -33,31 +34,22 @@ export class SigninComponent implements  AfterViewInit  {
         cookiepolicy: 'single_host_origin',
         scope : scopes
       });
-      //  this.googleSignIn(document.getElementById('googleBtn'));
     });
+    this.showSignInBtn = true;
   }
 
   public googleSignIn() {
-    // this.auth2.attachClickHandler(element, {},
-    //   (googleUser) => {
-    //     const profile = googleUser.getBasicProfile();
-    //     const token = googleUser.getAuthResponse().id_token;
-    //     console.log('Token || ' + token);
-    //     console.log('ID: ' + profile.getId());
-    //     this.autherizeToken(token);
-    //   }, function (error) {
-    //     console.log(JSON.stringify(error, undefined, 2));
-    //   });
 
-    this.auth2.grantOfflineAccess()
-      .then( (res) => { console.log(res);
+    if (this.auth2) {
+      this.auth2.grantOfflineAccess()
+      .then( (res) => {
         if (res.code) {
           this.signInService.setAuthCode(res.code);
           this.router.navigate(['./emails']);
         }
       });
+    }
   }
-
   // public autherizeToken(code) {
   //   this.signInService.fetchUserMails(code)
   //     .subscribe( res => {

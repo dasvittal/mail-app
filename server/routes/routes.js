@@ -1,9 +1,10 @@
 const userController = require('../controller/user.controller');
 
-module.exports = (app, passport) => {
+module.exports = (app) => {
 
     app.post('/getMails', userController.fetchUserMail);
 
+    app.get('/getMailBody', userController.fetchMailBody)
 
     // app.get('/auth/google', 
     //     passport.authenticate('google', { scope : ['profile', 'email']})

@@ -9,87 +9,103 @@ const gmail = google.gmail('v1');
 const DAY_COUNT = 30;
 
 const getAccessToken = (code) => {
-    const auth = new googleAuth();
-    const oauth2Client = new auth.OAuth2(
-        authConfig.googleAuth.clientID, 
-        authConfig.googleAuth.clientSecret, 
-        authConfig.googleAuth.callbackURL
-    );
+  const auth = new googleAuth();
+  const oauth2Client = new auth.OAuth2(
+    authConfig.googleAuth.clientID,
+    authConfig.googleAuth.clientSecret,
+    authConfig.googleAuth.callbackURL
+  );
 
-    return new Promise( (resolve, reject) => {
-        oauth2Client.getToken( code, (err, tokens) => {
-            if(err) {
-                console.log(err);
-                reject(err);
-            }
-            //console.log(tokens);
-            oauth2Client.credentials = tokens;
-            resolve(oauth2Client);
-        });
+  return new Promise((resolve, reject) => {
+    oauth2Client.getToken(code, (err, tokens) => {
+      if (err) {
+        console.log(err);
+        reject(err);
+      }
+      oauth2Client.credentials = tokens;
+      resolve(oauth2Client);
     });
-
+  });
 };
 
- const fetchUserMail = (req, res, next) => {
-    
-    getAccessToken(req.body.code)
-        .then( auth => {
-            gmail.users.threads.list({
-                auth: auth,
-                userId: 'me',
-                q: '-label:chats before:'+getDateByDays(DAY_COUNT)
-              }, function(err, response) {
-                if (err) {
-                  console.log('The API returned an error: ' + err);
-                  return;
-                }
-                //console.log(response);
-                fetchUserThreads(response.threads, auth);
-                res.send(response);
-              });
-        }).catch( err => { console.error(err); } );
-
-    };
-
-    const fetchUserThreads = (threads, auth) => {
-        try {
-            threads.forEach( thread => {
-                new Promise( (resolve, reject) => {
-                    gmail.users.threads.get({
-                        auth: auth,
-                        userId: 'me',
-                        id: thread.id                    
-                    }, saveUserThreadsToDb);
-                });
-            });
-        } catch (err) { 
-            console.error(err); 
+const fetchUserMail = (req, res, next) => {
+  getAccessToken(req.body.code)
+    .then(auth => {
+      gmail.users.threads.list({
+        auth: auth,
+        userId: 'me',
+        q: '-label:chats before:' + getDateByDays(DAY_COUNT)
+      }, function (err, response) {
+        if (err) {
+          console.log('The GAPI error: ' + err);
+          return;
         }
-        return;
-    };
+        if(response.threads) fetchUserThreads(response.threads, auth);
+        res.send(response);
+      });
+    }).catch(err => {
+      console.error(err);
+    });
+};
 
-    const saveUserThreadsToDb = (err, msg) => {
-        if(err) console.error(err);
-       try {
-        const thread = new Thread( {
-            id: msg.id,
-            historyId: msg.historyId,
-            message: [ msg.messages ]
+const fetchUserThreads = (threads, auth) => {
+  try {
+    threads.forEach(thread => {
+      setTimeout(() => {
+        new Promise((resolve, reject) => {
+          gmail.users.threads.get({
+            auth: auth,
+            userId: 'me',
+            id: thread.id
+          }, saveUserThreadsToDb);
         });
-        thread.save( (err, res) => {
-            if(err) console.log(err);
-          //  console.log('Thread Saved. '+ res);
-        });
-       } catch (error) {
-            console.error(error);
-       }
-        
-    };
+      }, 200);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+  return;
+};
 
-    const getDateByDays = (dayCount) => {
-        return moment().subtract(dayCount, 'days').format('YYYY/MM/DD');
-    };
+const saveUserThreadsToDb = (err, msg) => {
+  if (err) console.error(err);
+  try {
+    if (msg) {
+      const thread = new Thread(msg);
+      thread.save((err, res) => {
+        if (err) console.log(err);
+        //console.log('Thread Saved. ' + res);
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const getDateByDays = (dayCount) => {
+  return moment().subtract(dayCount, 'days').format('YYYY/MM/DD');
+};
+
+const fetchMailBody = () => {
+  try {
+    getAccessToken(req.).then( auth => {
+        gmail.users.messages.list({
+            auth: auth,
+            userId: 'me',
+          }, function (err, response) {
+            if (err) {
+              console.log('The GAPI error: ' + err);
+              return;
+            }
+            res.send(response);
+        });
+    }) ;
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 module.exports = {
-    fetchUserMail : fetchUserMail
-}
+  fetchUserMail: fetchUserMail,
+  fetchMailBody: fetchMailBody
+};

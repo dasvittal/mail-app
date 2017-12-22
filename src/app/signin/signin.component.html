@@ -6,7 +6,7 @@
             <h1>  Welcome to Mail App  </h1>
             <p>Click below button to login using google</p>
         <br/><br/><br/>            
-       <div class="div-center">
+       <div class="div-center" [hidden]="!showSignInBtn">
             <a href="#" (click)="googleSignIn()">
                 <img class="google-img" src="/assets/img/btn_google.png" />
             </a>
