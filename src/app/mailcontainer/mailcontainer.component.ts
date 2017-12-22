@@ -23,8 +23,8 @@ export class MailcontainerComponent implements OnInit {
 
   }
 
-  public getThreadBody(userId) {
-    this.signInService.getThreadBody()
+  public getThreadBody(messageId) {
+    this.signInService.getThreadBody(messageId)
       .subscribe( res => {
           console.log(res);
       });

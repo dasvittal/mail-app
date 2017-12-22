@@ -15,15 +15,19 @@ export class SigninService {
   constructor(private http: Http) { }
 
   public fetchUserMails(): Observable<any> {
-    return this.http.get('/getMails', this.getURLParams({code : this.authCode}, this.getHeaders()))
+    const options = this.getHeaders();
+    const params = new URLSearchParams();
+    params.append('code', this.authCode);
+    options.search = params;
+    return this.http.post('/getMails', JSON.stringify({ code : this.authCode}), this.getHeaders() )
       .map( ( res: Response) => {
         return res.json();
       })
       .catch( (err: Response) => { console.log(err); throw err; });
   }
 
-  public getThreadBody(): Observable<any> {
-    return this.http.get('/getMailBody',  this.getURLParams({code : this.authCode}, this.getHeaders()))
+  public getThreadBody(messageId): Observable<any> {
+    return this.http.post('/getMailBody/' + messageId , JSON.stringify({code : this.authCode}), this.getHeaders())
       .map( ( res: Response) => {
         return res.json();
       })

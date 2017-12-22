@@ -28,8 +28,25 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
-app.use(passport.initialize());
+//app.use(passport.initialize());
 routes(app);
 
 app.listen(port);
 console.log('Server started on port : ' + port);
+
+
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+    let err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// error handler
+app.use((err, req, res, next) => {
+    console.error('\x1b[31m', err.stack);
+
+    res.status(err.status || 500);
+    if (err.status == 404) res.send(err.message);
+    else res.json({ error: 'oops! Something broke. Unable to process.'});
+});

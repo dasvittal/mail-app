@@ -39,7 +39,6 @@ export class SigninComponent implements  AfterViewInit  {
   }
 
   public googleSignIn() {
-
     if (this.auth2) {
       this.auth2.grantOfflineAccess()
       .then( (res) => {

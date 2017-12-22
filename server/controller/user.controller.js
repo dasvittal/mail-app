@@ -15,17 +15,19 @@ const getAccessToken = (code) => {
     authConfig.googleAuth.clientSecret,
     authConfig.googleAuth.callbackURL
   );
+    return new Promise((resolve, reject) => {
+        if(code) {
+          oauth2Client.getToken(code, (err, tokens) => {
+            if (err) {
+              console.log(err);
+              reject(err);
+            }
+            oauth2Client.credentials = tokens;
+            resolve(oauth2Client);
+          });
+        } else {reject({err: 'code is empty !'});}
+      });
 
-  return new Promise((resolve, reject) => {
-    oauth2Client.getToken(code, (err, tokens) => {
-      if (err) {
-        console.log(err);
-        reject(err);
-      }
-      oauth2Client.credentials = tokens;
-      resolve(oauth2Client);
-    });
-  });
 };
 
 const fetchUserMail = (req, res, next) => {
@@ -86,10 +88,11 @@ const getDateByDays = (dayCount) => {
   return moment().subtract(dayCount, 'days').format('YYYY/MM/DD');
 };
 
-const fetchMailBody = () => {
+const fetchMailBody = (req, res, next) => {
   try {
-    getAccessToken(req.).then( auth => {
-        gmail.users.messages.list({
+    console.log(req.query);
+    getAccessToken(req.body.code).then( auth => {
+        gmail.users.threads.get({
             auth: auth,
             userId: 'me',
           }, function (err, response) {

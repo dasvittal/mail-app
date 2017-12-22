@@ -4,7 +4,7 @@ module.exports = (app) => {
 
     app.post('/getMails', userController.fetchUserMail);
 
-    app.get('/getMailBody', userController.fetchMailBody)
+    app.post('/getMailBody/:id', userController.fetchMailBody)
 
     // app.get('/auth/google', 
     //     passport.authenticate('google', { scope : ['profile', 'email']})
