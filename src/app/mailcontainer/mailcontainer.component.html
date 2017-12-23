@@ -1,10 +1,10 @@
 <div class="container-flex">
   <div class="row">
-    <div class="col-lg-8 div-center">
+    <div class="col-lg-7 div-center">
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search..." />
+        <input type="text" class="form-control" name="searchHolder" placeholder="Search..." (keydown.space)="$event.preventDefault()" #searchInput />
         <span class="input-group-btn">
-          <button class="btn btn-primary" type="button">Search </button>
+          <button class="btn btn-primary" type="button" (click)="getSearchResults(searchInput.value)">Search </button>
         </span>
       </div>
     </div>
@@ -12,13 +12,20 @@
     <div class="mail-container">
         <div class="row">
             <div class="col-md-8 div-center">
-                <div class="list-group">
+                <div class="list-group" *ngIf="searchResults">
                     <a href="javascript:void(0);" class="list-group-item list-group-item-action" 
-                          *ngFor="let mail of mailThreads" (click)="getThreadBody(mail.id)">{{mail.snippet}}</a>
+                          *ngFor="let mail of searchResults" (click)="getThreadBody(mail.id)">{{mail.messages[0].snippet}}</a>
+                         
                   </div>
+                  
             </div>
           </div>
     </div>
-  </div>
 
+  </div>
+  <div class="row">
+    <div class="col-md-6 div-center" [hidden]="showResults">
+      <p>No Results Found for keyword "{{ searchInput.value}}"</p>
+    </div>
+  </div>
 </div>

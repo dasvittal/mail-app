@@ -10,13 +10,15 @@ import { MailcontainerComponent } from './mailcontainer/mailcontainer.component'
 import { SigninService } from './services/signin.service';
 
 import { routes } from './routes/route';
+import { DetailComponent } from './detail/detail.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     SigninComponent,
-    MailcontainerComponent
+    MailcontainerComponent,
+    DetailComponent
   ],
   imports: [
     BrowserModule,

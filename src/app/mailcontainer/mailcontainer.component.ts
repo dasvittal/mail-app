@@ -10,6 +10,8 @@ import { SigninService } from '../services/signin.service';
 })
 export class MailcontainerComponent implements OnInit {
   public mailThreads = [];
+  public searchResults = [];
+  public showResults = true;
 
   constructor(private signInService: SigninService,
               private router: Router) { }
@@ -23,10 +25,18 @@ export class MailcontainerComponent implements OnInit {
 
   }
 
+  public getSearchResults(searchKey) {
+    this.signInService.getSearchResults(searchKey)
+      .subscribe( res => {
+          this.searchResults = res;
+          this.showResults = res.length ? true : false;
+      });
+  }
+
   public getThreadBody(messageId) {
     this.signInService.getThreadBody(messageId)
       .subscribe( res => {
-          console.log(res);
+          console.log(res.length); 
       });
   }
 

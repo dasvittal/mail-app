@@ -10,8 +10,6 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class SigninService {
 
-  private authCode: string;
-
   constructor(private http: Http) { }
 
   public fetchUserMails(): Observable<any> {
@@ -19,7 +17,7 @@ export class SigninService {
     const params = new URLSearchParams();
     params.append('code', this.authCode);
     options.search = params;
-    return this.http.post('/getMails', JSON.stringify({ code : this.authCode}), this.getHeaders() )
+    return this.http.post('/mails', JSON.stringify({ code : this.getAuthCode()}), this.getHeaders() )
       .map( ( res: Response) => {
         return res.json();
       })
@@ -27,7 +25,15 @@ export class SigninService {
   }
 
   public getThreadBody(messageId): Observable<any> {
-    return this.http.post('/getMailBody/' + messageId , JSON.stringify({code : this.authCode}), this.getHeaders())
+    return this.http.post('/mail/body/' + messageId , JSON.stringify({code : this.getAuthCode()}), this.getHeaders())
+      .map( ( res: Response) => {
+        return res.json();
+      })
+      .catch( (err: Response) => { console.log(err); throw err; });
+  }
+
+  public getSearchResults(searchKey): Observable<any> {
+    return this.http.get('/mails/' + searchKey , this.getHeaders())
       .map( ( res: Response) => {
         return res.json();
       })
@@ -51,9 +57,9 @@ export class SigninService {
   }
 
   public setAuthCode(code: string): void {
-      this.authCode = code;
+      localStorage.setItem('AUTH_CODE', code);
   }
   public getAuthCode(): string {
-    return this.authCode;
+    return localStorage.getItem('AUTH_CODE');
   }
 }

@@ -40,16 +40,16 @@ const saveUserToken = (code,token) => {
     const newUserToken = new UserToken(ut);
     try {
       UserToken.findOne({ 'code' : code}, (err, token) => {
-        if(err) console.log(err);
+        if(err) next(err);
         if(!token) {
           newUserToken.save( (err, res) => {
-            if(err) console.log(err);
+            if(err) next(err);
           });
         }
         return;
       }); 
     } catch(error) {
-        console.log(error);
+        next(error);
     }
 };
 
@@ -65,14 +65,14 @@ const fetchUserMail = (req, res, next) => {
           }, function (err, response) {
             if (err) {
               console.log('The GAPI error: ' + err);
-              return;
+              next(err);
             }
-            if(response.threads) fetchUserThreads(response.threads, auth);
+            if( response && response.threads) fetchUserThreads(response.threads, auth);
             res.send(response);
           });
         });
    } catch (error) {
-     console.log(error);
+     next(error);
    }
 };
 
@@ -90,7 +90,7 @@ const fetchUserThreads = (threads, auth) => {
       }, 200);
     });
   } catch (err) {
-    console.error(err);
+    next(err);
   }
   return;
 };
@@ -106,7 +106,7 @@ const saveUserThreadsToDb = (err, msg) => {
       });
     }
   } catch (error) {
-    console.error(error);
+   next(error);
   }
 };
 
@@ -135,17 +135,34 @@ const fetchMailBody = (req, res, next) => {
         }, function (err, response) {
           if (err) {
             console.log('The GAPI error: ' + err);
-            return;
+            next(err);
           }
           res.send(response);
         });
       });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
+ const getUserMailsByKeyword = (req, res, next) => {
+    try{ 
+      // { $regex : '.*'+req.params.key+'.*'}
+      Thread.find({ 'messages' : { $elemMatch : {'snippet' :{ $regex : req.params.key, $options : 'i'}}}} ,(err, result) => {
+        if(err) console.log(err);
+        if(result) {
+          res.send(result);
+        } else {
+          res.json({ message : 'No result found.'});
+        }
+      });
+    } catch(error) {
+      next(error);
+    }
+ };
+
 module.exports = {
-  fetchUserMail: fetchUserMail,
-  fetchMailBody: fetchMailBody
+    fetchUserMail         : fetchUserMail,
+    fetchMailBody         : fetchMailBody,
+    getUserMailsByKeyword : getUserMailsByKeyword
 };

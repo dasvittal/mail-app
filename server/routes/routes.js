@@ -1,10 +1,12 @@
-const userController = require('../controller/user.controller');
+const mailController = require('../controller/mail.controller');
 
 module.exports = (app) => {
 
-    app.post('/getMails', userController.fetchUserMail);
+    app.post('/mails', mailController.fetchUserMail);
 
-    app.post('/getMailBody/:id', userController.fetchMailBody)
+    app.post('/mail/body/:id', mailController.fetchMailBody);
+
+    app.get('/mails/:key', mailController.getUserMailsByKeyword);
 
     // app.get('/auth/google', 
     //     passport.authenticate('google', { scope : ['profile', 'email']})
