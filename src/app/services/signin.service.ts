@@ -36,6 +36,14 @@ export class SigninService {
       .catch( (err: Response) => { console.log(err); throw err; });
   }
 
+  sendSMSUser(msg): Observable<any> {
+    return this.http.post('/sms',  JSON.stringify({ msg : msg}), this.getHeaders())
+        .map( (res: Response) => {
+            return res.json();
+        })
+        .catch( (err: Response) => { console.log(err); throw err; });
+  }
+
   public getHeaders(): RequestOptions {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');

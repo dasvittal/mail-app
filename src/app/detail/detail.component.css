@@ -10,3 +10,7 @@
   float: none;
   margin: 0 auto;
 }
+
+.header {
+  line-height: 12px;
+}

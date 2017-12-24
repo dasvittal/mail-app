@@ -9,20 +9,16 @@
         </span>
       </div>
     </div>
-
     <div class="mail-container">
         <div class="row">
             <div class="col-md-8 div-center">
                 <div class="list-group" >
                     <a href="javascript:void(0);" class="list-group-item list-group-item-action"
                           *ngFor="let mail of searchResults" (click)="goToMailBody(mail.id)">{{mail.messages[0].snippet}}</a>
-
                   </div>
-
             </div>
           </div>
     </div>
-
   </div>
   <div class="row not-found">
     <div class="col-md-6 div-center" [hidden]="showResults">

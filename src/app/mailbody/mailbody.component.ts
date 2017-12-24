@@ -5,7 +5,6 @@ import { DomSanitizer} from '@angular/platform-browser';
 @Component({
   selector: 'nw-mailbody',
   template: '<div [innerHTML]="mailBody"></div>'
-  //encapsulation: ViewEncapsulation.None
 })
 export class MailbodyComponent implements OnInit {
 

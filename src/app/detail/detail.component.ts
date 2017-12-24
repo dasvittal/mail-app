@@ -1,15 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
 import { SigninService } from '../services/signin.service';
+import { ISubscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'nw-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.css']
 })
-export class DetailComponent implements OnInit {
+export class DetailComponent implements OnInit, OnDestroy {
 
+  private subscription : ISubscription;
   private messageId: string;
   public mailBody: any;
   public mailDetails = {
@@ -23,7 +25,7 @@ export class DetailComponent implements OnInit {
               private signInService: SigninService) { }
 
   public getMessageBody() {
-      this.signInService.getThreadBody(this.messageId)
+      this.subscription = this.signInService.getThreadBody(this.messageId)
           .subscribe( res => {
               if (res) {
                 if (res.payload.body.size) {
@@ -56,11 +58,22 @@ export class DetailComponent implements OnInit {
     }
   }
 
+  sendAsSMS() {
+    this.subscription = this.signInService.sendSMSUser(this.mailDetails.subject)
+        .subscribe( res => {
+            console.log(res);
+        });
+  }
+
   ngOnInit() {
       this.route.params.subscribe( param => {
           this.messageId = param['id'];
           this.getMessageBody();
       });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
 }

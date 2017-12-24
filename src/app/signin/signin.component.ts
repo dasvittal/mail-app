@@ -44,6 +44,7 @@ export class SigninComponent implements  AfterViewInit  {
       .then( (res) => {
         if (res.code) {
           this.signInService.setAuthCode(res.code);
+          this.signInService.fetchUserMails();
           this.router.navigate(['./emails']);
         }
       });

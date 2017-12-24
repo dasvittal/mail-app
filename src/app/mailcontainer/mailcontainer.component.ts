@@ -1,54 +1,62 @@
-import { Component, OnInit, NgZone } from '@angular/core';
-import { Router, NavigationEnd, Event, RouterStateSnapshot  } from '@angular/router';
+import { Component, OnInit, NgZone, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy  } from '@angular/core';
+import { Router, NavigationEnd, Event } from '@angular/router';
 import 'rxjs/add/operator/pairwise';
-
 import 'rxjs/add/operator/filter';
 import { SigninService } from '../services/signin.service';
+import { ISubscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'nw-mailcontainer',
   templateUrl: './mailcontainer.component.html',
-  styleUrls: ['./mailcontainer.component.css']
+  styleUrls: ['./mailcontainer.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MailcontainerComponent implements OnInit {
+export class MailcontainerComponent implements OnInit, OnDestroy  {
   public mailThreads = [];
   public searchResults = [];
   public showResults = true;
   public searchInput: string;
-  public count = 0;
+  public subscription: ISubscription;
   constructor(private signInService: SigninService,
               private router: Router,
-              private ngZone: NgZone) {
-    this.router.events
-      .filter(e => e instanceof NavigationEnd)
-      .pairwise()
-      .subscribe( (event) => {
-        let navEvent = event[0];
-        if (navEvent instanceof NavigationEnd ) {
-         const prevURL = navEvent.url.includes('detail');
-          if (prevURL) {
-            const searchData = this.signInService.getLastSearchResult();
-            if (searchData) {
-              // this.ngZone.run( () => {
-                this.searchResults = searchData.data;
-                this.searchInput = searchData.key;
-              // });
-            }
-          }
-        }
-    });
+              private ngZone: NgZone,
+              private cdRef: ChangeDetectorRef) {
+
+
+    //   this.router.events
+    //   .filter(e => e instanceof NavigationEnd)
+    //   .pairwise()
+    //   .subscribe( (event) => {
+    //     const navEnd = event[0];
+    //     if (navEnd instanceof NavigationEnd ) {
+    //       const prevURL = navEnd.url.includes('detail');
+    //       if (prevURL) {
+    //         const searchData = this.signInService.getLastSearchResult();
+    //         console.log(searchData);
+    //         setTimeout( () => {
+    //           if (searchData) {
+    //             // this.ngZone.run( () => {
+    //               this.searchResults = searchData.data;
+    //               this.searchInput = searchData.key;
+    //              // this.cdRef.detectChanges();
+    //             //});
+    //           }
+    //         }, 1000);
+    //       }
+    //     }
+    // });
   }
 
-  public fetchUserEmails() {
-    this.signInService.fetchUserMails()
+  fetchUserEmails() {
+    this.subscription = this.signInService.fetchUserMails()
       .subscribe( res => {
         this.mailThreads = res.threads;
       });
   }
 
-  public getSearchResults(searchKey) {
+  getSearchResults(searchKey) {
     if (searchKey) {
-      this.signInService.getSearchResults(searchKey)
+      this.subscription = this.signInService.getSearchResults(searchKey)
       .subscribe( res => {
           this.ngZone.run( () => {
             this.searchResults = res;
@@ -58,7 +66,7 @@ export class MailcontainerComponent implements OnInit {
     }
   }
 
-  public goToMailBody(msgId) {
+  goToMailBody(msgId) {
     this.signInService.storeLastSearchResult(this.searchInput , this.searchResults);
     this.router.navigate(['/detail', msgId]);
   }
@@ -71,7 +79,10 @@ export class MailcontainerComponent implements OnInit {
   // }
 
   ngOnInit() {
-    this.signInService.getAuthCode() ? setTimeout( () => this.fetchUserEmails(), 200) : this.router.navigate(['']);
+    if (! this.signInService.getAuthCode()) { this.router.navigate(['']); }
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
 }

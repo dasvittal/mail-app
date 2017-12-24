@@ -1,4 +1,5 @@
 const mailController = require('../controller/mail.controller');
+const smsController = require('../controller/sms.controller');
 
 module.exports = (app) => {
 
@@ -8,11 +9,12 @@ module.exports = (app) => {
 
     app.get('/mails/:key', mailController.getUserMailsByKeyword);
 
-    // app.get('/auth/google', 
+    app.post('/sms', smsController.sendSMSToUser);
+    // app.get('/auth/google',
     //     passport.authenticate('google', { scope : ['profile', 'email']})
     // );
 
-    // app.get('auth/google/callback', passport.authenticate('google', {successRedirect : '/emails',failureRedirect : '/'})   
+    // app.get('auth/google/callback', passport.authenticate('google', {successRedirect : '/emails',failureRedirect : '/'})
     // );
 
     // function isLoggedIn (req, res, next) {
