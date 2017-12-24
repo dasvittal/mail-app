@@ -13,10 +13,6 @@ export class SigninService {
   constructor(private http: Http) { }
 
   public fetchUserMails(): Observable<any> {
-    const options = this.getHeaders();
-    const params = new URLSearchParams();
-    params.append('code', this.authCode);
-    options.search = params;
     return this.http.post('/mails', JSON.stringify({ code : this.getAuthCode()}), this.getHeaders() )
       .map( ( res: Response) => {
         return res.json();
@@ -56,10 +52,17 @@ export class SigninService {
     return options ? options.search = params : params;
   }
 
+  public storeLastSearchResult(key, data): void {
+    const searchData = { key: key, data: data};
+    localStorage.setItem('SEARCH_DATA', JSON.stringify(searchData));
+  }
+  public getLastSearchResult() {
+    return JSON.parse(localStorage.getItem('SEARCH_DATA'));
+  }
   public setAuthCode(code: string): void {
-      localStorage.setItem('AUTH_CODE', code);
+      sessionStorage.setItem('AUTH_CODE', code);
   }
   public getAuthCode(): string {
-    return localStorage.getItem('AUTH_CODE');
+    return sessionStorage.getItem('AUTH_CODE');
   }
 }

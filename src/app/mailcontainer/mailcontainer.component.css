@@ -1,5 +1,5 @@
 .mail-container {
-    margin: 30px 0 0 0;
+    margin: 30px 0 0 60px;
 }
 
 .div-center{
@@ -15,4 +15,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.not-found{
+    margin-top : 40px;
 }

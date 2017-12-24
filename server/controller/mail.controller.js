@@ -61,14 +61,14 @@ const fetchUserMail = (req, res, next) => {
             auth: auth,
             userId: 'me',
             labelIds: ['INBOX', 'IMPORTANT'],
-            q: '-label:chats before:' + getDateByDays(DAY_COUNT)
+            q: 'after:' + getDateByDays(DAY_COUNT)
           }, function (err, response) {
             if (err) {
               console.log('The GAPI error: ' + err);
               next(err);
             }
             if( response && response.threads) fetchUserThreads(response.threads, auth);
-            res.send(response);
+            res.send({ msg: 'Success!' });
           });
         });
    } catch (error) {
@@ -148,14 +148,15 @@ const fetchMailBody = (req, res, next) => {
  const getUserMailsByKeyword = (req, res, next) => {
     try{ 
       // { $regex : '.*'+req.params.key+'.*'}
-      Thread.find({ 'messages' : { $elemMatch : {'snippet' :{ $regex : req.params.key, $options : 'i'}}}} ,(err, result) => {
-        if(err) console.log(err);
-        if(result) {
-          res.send(result);
-        } else {
-          res.json({ message : 'No result found.'});
-        }
-      });
+      Thread.find({ 'messages' : { $elemMatch : {'snippet' :{ $regex : req.params.key, $options : 'i'}}}}).limit(10)
+            .exec( (err, result) => {
+              if(err) console.log(err);
+              if(result) {
+                res.send(result);
+              } else {
+                res.json({ message : 'No result found.'});
+              }
+            });
     } catch(error) {
       next(error);
     }

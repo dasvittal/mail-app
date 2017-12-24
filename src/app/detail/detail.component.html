@@ -1,3 +1,23 @@
-<p>
-  detail works!
-</p>
+<div class="container">
+  <div class="row">
+      <div class="col-md-12">
+          <button type="button" class="btn btn-primary left" [routerLink]="['/emails']">Go Back</button>
+          <button type="button" class="btn btn-success right">Send as SMS</button>
+      </div>
+  </div>
+  <div class="row msgbody">
+    <div class="col-md-9  div-center">
+            <p><b>Date :</b> {{mailDetails.date}}</p>
+            <p><b>From :</b>   {{mailDetails.from}} </p>
+            <p><b>To :</b>   {{mailDetails.to}}  </p>
+            <p><b>Subject :</b>   {{mailDetails.subject}} </p>
+
+          <p>{{msgBody}}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-9 div-center" *ngIf="mailBody">
+      <nw-mailbody [parsedBody]="mailBody"></nw-mailbody>
+    </div>
+  </div>
+</div>

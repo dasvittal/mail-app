@@ -1,0 +1,12 @@
+.right {
+    float : right;
+}
+
+.msg-body{
+    margin-top: 50px;
+}
+
+.div-center{
+  float: none;
+  margin: 0 auto;
+}
